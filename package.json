@@ -1,0 +1,41 @@
+{
+	"name": "indiecon-server",
+	"version": "0.0.0",
+	"description": "This repository serves as the server for the Indiecon web app.",
+	"main": "index.js",
+	"scripts": {
+		"prod": "pm2 start ecosystem.config.js --only 'indiecon-server-prod,indiecon-server-staging'",
+		"dev": "pm2 start ecosystem.config.js --only 'indiecon-server-dev'"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/indiecon/server.git"
+	},
+	"keywords": [
+		"Node",
+		"JavaScript",
+		"Express",
+		"Mongoose",
+		"MongoDB"
+	],
+	"author": "https://github.com/AdityaKG-169",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/indiecon/server/issues",
+		"email": "adityakrishnaoff@gmail.com"
+	},
+	"homepage": "https://indiecon.co",
+	"dependencies": {
+		"body-parser": "^1.20.1",
+		"cors": "^2.8.5",
+		"crypto-js": "^4.1.1",
+		"dotenv": "^16.0.3",
+		"express": "^4.18.2",
+		"express-rate-limit": "^6.7.0",
+		"helmet": "^6.0.1",
+		"ioredis": "^5.2.4",
+		"jsonwebtoken": "^9.0.0",
+		"mongoose": "^6.8.0",
+		"morgan": "^1.10.0"
+	}
+}
