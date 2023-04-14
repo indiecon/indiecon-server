@@ -3,7 +3,7 @@ const CryptoJS = require('crypto-js');
 const errorLogger = require('./logErrors.utils');
 
 // data can be an object or a string
-export const encrypt = (data) => {
+const encrypt = (data) => {
 	try {
 		const key = process.env.ENCRYPTION_KEY;
 		// encrypted is an object of type CryptoJS.lib.CypherParams. We have to convert it to string later.
@@ -30,3 +30,5 @@ export const encrypt = (data) => {
 		};
 	}
 };
+
+module.exports = { encrypt };

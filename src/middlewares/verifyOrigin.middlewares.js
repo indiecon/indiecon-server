@@ -1,7 +1,8 @@
 const redis = require('../db/redisClient');
-const { errorLogger, decrypt } = require('../utils');
+const { errorLogger } = require('../utils/logErrors.utils');
+const { decrypt } = require('../utils/decrypt.utils');
 
-export const verifyOrigin = async (req, res, next) => {
+const verifyOrigin = async (req, res, next) => {
 	try {
 		// x-custom-header is the header that will be sent from the origin source to the server just to verify if the request is coming from a valid origin source and is not forged or tampered with.
 		// x-custom-header will be of the form 'origin::timestamp::randomString' and encrypted using AES algorithm.
@@ -117,3 +118,5 @@ export const verifyOrigin = async (req, res, next) => {
 		});
 	}
 };
+
+module.exports = { verifyOrigin };

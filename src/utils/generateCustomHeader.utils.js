@@ -1,8 +1,8 @@
 // function to generate custom header for testing in the localhost
 
-const encrypt = require('./encrypt.utils');
+const { encrypt } = require('./encrypt.utils');
 
-export const generateCustomHeader = () => {
+const generateCustomHeader = () => {
 	const origin = 'localhost';
 	const timestamp = new Date().getTime();
 	const randomString =
@@ -14,3 +14,5 @@ export const generateCustomHeader = () => {
 		'x-custom-header-development: ': encrypt(headerString).responsePayload,
 	};
 };
+
+module.exports = { generateCustomHeader };

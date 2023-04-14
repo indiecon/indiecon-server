@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken');
 
-const errorLogger = require('./logErrors.utils');
+const { errorLogger } = require('./logErrors.utils');
 
 // jwtObject is the object that needs to be tokenised
 // jwtObject = {userId: '1234567890'} userId is string.
-export const generateJWT = async (jwtObject) => {
+const generateJWT = async (jwtObject) => {
 	try {
 		let { userId } = jwtObject;
 
@@ -43,3 +43,5 @@ export const generateJWT = async (jwtObject) => {
 		};
 	}
 };
+
+module.exports = { generateJWT };

@@ -2,12 +2,10 @@ require('dotenv').config();
 
 const ENV = process.env.NODE_ENV;
 
-// OpenAI API Key and Org ID same for dev and staging. Different for production
-
 const config = {
 	development: {
 		app: {
-			port: 8080,
+			port: process.env.PORT_DEV,
 		},
 		db: {
 			uri: process.env.DEV_MONGODB_URI,
@@ -15,7 +13,7 @@ const config = {
 	},
 	staging: {
 		app: {
-			port: 6969,
+			port: process.env.PORT_STAGING,
 		},
 		db: {
 			uri: process.env.STAGING_MONGODB_URI,
@@ -23,7 +21,7 @@ const config = {
 	},
 	production: {
 		app: {
-			port: 8081,
+			port: process.env.PORT_PROD,
 		},
 		db: {
 			uri: process.env.PRODUCTION_MONGODB_URI,
@@ -32,4 +30,4 @@ const config = {
 };
 
 // instead of exporting the config object, we export the config object based on the environment
-module.exports = config[ENV];
+module.exports = { config: config[ENV] };

@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 // app is the express app
-export function networkLoggerMiddleware(app) {
+function networkLoggerMiddleware(app) {
 	// below part is for logging the response body
 	const originalJson = app.response.json;
 	app.response.json = function sendOverWrite(body) {
@@ -92,3 +92,5 @@ export function networkLoggerMiddleware(app) {
 		)
 	);
 }
+
+module.exports = { networkLoggerMiddleware };

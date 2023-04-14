@@ -3,14 +3,19 @@ const helmet = require('helmet');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-const config = require('./src/config/config');
-const db = require('./src/db/mongoClient');
+const { config } = require('./src/config/config');
+const { db } = require('./src/db/mongoClient');
 const {
 	verifyOrigin,
+} = require('./src/middlewares/verifyOrigin.middlewares.js');
+const { rateLimiter } = require('./src/middlewares/rateLimiter.middlewares.js');
+const {
 	networkLoggerMiddleware,
-	rateLimiter,
-} = require('./src/middlewares');
-const { generateCustomHeader, errorLogger } = require('./src/utils');
+} = require('./src/middlewares/networkLogger.middlewares.js');
+const {
+	generateCustomHeader,
+} = require('./src/utils/generateCustomHeader.utils');
+const { errorLogger } = require('./src/utils/logErrors.utils');
 
 const app = express();
 

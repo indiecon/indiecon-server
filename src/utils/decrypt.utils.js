@@ -3,7 +3,7 @@ const CryptoJS = require('crypto-js');
 const errorLogger = require('./logErrors.utils');
 
 // function to decrypt the data where data is the encrypted data
-export const decrypt = (data) => {
+const decrypt = (data) => {
 	try {
 		const key = process.env.ENCRYPTION_KEY;
 		// decrypted is an object of type CryptoJS.lib.WordArray. We have to convert it to string later.
@@ -29,3 +29,5 @@ export const decrypt = (data) => {
 		};
 	}
 };
+
+module.exports = { decrypt };
