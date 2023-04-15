@@ -2,7 +2,7 @@ const {
 	loginFounder,
 	getFounderById,
 	updateFounderProfile,
-	listFounders,
+	listFoundersAndStartups,
 } = require('./dal.founder');
 
 const loginController = async (req, res) => {
@@ -136,7 +136,7 @@ const updateFounderProfileController = async (req, res) => {
 const listFoundersController = async (req, res) => {
 	const page = req.params ? (req.params.page ? req.params.page : 1) : 1;
 
-	const listResult = await listFounders({ page });
+	const listResult = await listFoundersAndStartups({ page });
 
 	if (listResult.responseType === 'error' || listResult.responseCode === 404)
 		return res.status(listResult.responseCode).json(listResult);

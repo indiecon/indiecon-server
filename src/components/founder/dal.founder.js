@@ -443,7 +443,7 @@ const updateFounderProfile = async (context) => {
 	}
 };
 
-const listFounders = async (context) => {
+const listFoundersAndStartups = async (context) => {
 	try {
 		const limit = context.limit || 10;
 		const page = context.page || 1;
@@ -461,7 +461,7 @@ const listFounders = async (context) => {
 		if (!founders) {
 			return {
 				responseType: 'error',
-				responseUniqueCode: 'list_founders_error',
+				responseUniqueCode: 'listFoundersAndStartups_error',
 				responsePayload: null,
 				responseCode: 500,
 				responseMessage:
@@ -473,10 +473,10 @@ const listFounders = async (context) => {
 		if (founders.length === 0) {
 			return {
 				responseType: 'success',
-				responseUniqueCode: 'no_founders_found',
+				responseUniqueCode: 'no_founders_and_startups_found',
 				responsePayload: [],
 				responseCode: 404,
-				responseMessage: 'No founders found',
+				responseMessage: 'No founders and startups found',
 				responseId: 'uA8FeaW6NkTjksVc',
 			};
 		}
@@ -493,12 +493,68 @@ const listFounders = async (context) => {
 		errorLogger('DbHpqxp40AmXPFHF', error);
 		return {
 			responseType: 'error',
-			responseUniqueCode: 'list_founders_error',
+			responseUniqueCode: 'listFoundersAndStartups_error',
 			responsePayload: null,
 			responseCode: 500,
 			responseMessage:
 				'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
 			responseId: 'DbHpqxp40AmXPFHF',
+		};
+	}
+};
+
+const getFounderAndStartupByStartupId = async (context) => {
+	try {
+		if (!context || !context.startupId || !context.startupId.trim()) {
+			return {
+				responseType: 'error',
+				responseUniqueCode: 'getFounderAndStartupByStartupId_error',
+				responsePayload: null,
+				responseCode: 400,
+				responseMessage:
+					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+				responseId: 'gAJcLzDjElp47MZH',
+			};
+		}
+
+		let { startupId } = context;
+		startupId = startupId.trim();
+
+		const founderAndStartup = await FounderModel.findOne({
+			startupId,
+			areBothProfilesComplete: true,
+		}).populate('startupId');
+
+		if (!founderAndStartup) {
+			return {
+				responseType: 'success',
+				responseUniqueCode: 'getFounderAndStartupByStartupId_error',
+				responsePayload: null,
+				responseCode: 404,
+				responseMessage:
+					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+				responseId: 'RHG7J7JIdC91Bf0k',
+			};
+		}
+
+		return {
+			responseType: 'success',
+			responseUniqueCode: 'getFounderAndStartupByStartupId_success',
+			responsePayload: founderAndStartup,
+			responseCode: 200,
+			responseMessage: 'Founder and startup found',
+			responseId: 'TSmJyv2qA5GEwiWH',
+		};
+	} catch (error) {
+		errorLogger('UUv0ObM2amF99Qo4', error);
+		return {
+			responseType: 'error',
+			responseUniqueCode: 'getFounderAndStartupByStartupId_error',
+			responsePayload: null,
+			responseCode: 500,
+			responseMessage:
+				'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+			responseId: 'UUv0ObM2amF99Qo4',
 		};
 	}
 };
@@ -509,5 +565,6 @@ module.exports = {
 	loginFounder,
 	getFounderById,
 	updateFounderProfile,
-	listFounders,
+	listFoundersAndStartups,
+	getFounderAndStartupByStartupId,
 };
