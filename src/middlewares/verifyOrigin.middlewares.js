@@ -20,7 +20,7 @@ const verifyOrigin = async (req, res, next) => {
 				responseCode: 403,
 				responseUniqueCode: 'missing_custom_header',
 				responsePayload: null,
-				responseId: '283798798s7fsf',
+				responseId: 'header_error',
 			});
 		}
 
@@ -28,7 +28,15 @@ const verifyOrigin = async (req, res, next) => {
 		const decryptedHeaderObject = decrypt(customHeaderValue);
 
 		if (decryptedHeaderObject.responseType === 'error') {
-			return res.status(403).json(decryptedHeaderObject);
+			return res.status(403).json({
+				responseType: 'error',
+				responseMessage:
+					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+				responseUniqueCode: 'missing_custom_header',
+				responseCode: 403,
+				responsePayload: decryptedHeaderObject.responsePayload,
+				responseId: decryptedHeaderObject.responseId,
+			});
 		}
 
 		// origin::timestamp::randomString as string
@@ -52,7 +60,7 @@ const verifyOrigin = async (req, res, next) => {
 				responseMessage:
 					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
 				responseCode: 403,
-				responseUniqueCode: 'invalid_custom_header',
+				responseUniqueCode: 'header_error',
 				responsePayload: null,
 				responseId: 'flkajs4739847873',
 			});
@@ -68,7 +76,7 @@ const verifyOrigin = async (req, res, next) => {
 				responseMessage:
 					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
 				responseCode: 403,
-				responseUniqueCode: 'custom_header_expired',
+				responseUniqueCode: 'header_error',
 				responsePayload: null,
 				responseId: '238798sdglksmdflkn',
 			});
@@ -82,7 +90,7 @@ const verifyOrigin = async (req, res, next) => {
 				responseMessage:
 					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
 				responseCode: 403,
-				responseUniqueCode: 'invalid_origin',
+				responseUniqueCode: 'header_error',
 				responsePayload: null,
 				responseId: '2380180sdnlnfsn',
 			});
@@ -96,7 +104,7 @@ const verifyOrigin = async (req, res, next) => {
 				responseMessage:
 					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
 				responseCode: 403,
-				responseUniqueCode: 'duplicate_request',
+				responseUniqueCode: 'header_error',
 				responsePayload: null,
 				responseId: 'fasd762871538170',
 			});
@@ -112,7 +120,7 @@ const verifyOrigin = async (req, res, next) => {
 			responseMessage:
 				'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
 			responseCode: 500,
-			responseUniqueCode: 'internal_server_error',
+			responseUniqueCode: 'header_error',
 			responsePayload: null,
 			responseId: 'flsj3748979efajldflkj8hkj1h2',
 		});

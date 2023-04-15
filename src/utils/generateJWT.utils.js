@@ -3,24 +3,24 @@ const jwt = require('jsonwebtoken');
 const { errorLogger } = require('./logErrors.utils');
 
 // jwtObject is the object that needs to be tokenised
-// jwtObject = {userId: '1234567890'} userId is string.
+// jwtObject = {founderId: '1234567890'} founderId is string.
 const generateJWT = async (jwtObject) => {
 	try {
-		let { userId } = jwtObject;
+		let { founderId } = jwtObject;
 
-		if (!userId || typeof userId !== 'string' || !userId.trim()) {
+		if (!founderId || typeof founderId !== 'string' || !founderId.trim()) {
 			return {
 				responseType: 'error',
 				responseMessage:
 					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
 				responseCode: 400,
-				responseUniqueCode: 'user_id_required',
+				responseUniqueCode: 'error_generating_token',
 				responsePayload: null,
 				responseId: '230810nlksnldfkslkj',
 			};
 		}
 
-		userId = userId.trim();
+		founderId = founderId.trim();
 		const token = await jwt.sign(jwtObject, process.env.JWT_SECRET);
 		return {
 			responseType: 'success',

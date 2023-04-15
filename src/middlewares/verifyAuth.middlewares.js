@@ -2,6 +2,7 @@
 const jwt = require('jsonwebtoken');
 
 const { errorLogger } = require('../utils/logErrors.utils');
+const { getFounderById } = require('../components/founder/dal.founder');
 
 const verifyAuth = async (req, res, next) => {
 	try {
@@ -38,9 +39,9 @@ const verifyAuth = async (req, res, next) => {
 
 		const decoded = await jwt.verify(token, process.env.JWT_SECRET);
 
-		// decoded contains the object that contains userId and other details.
+		// decoded contains the object that contains founderId and other details.
 
-		if (!decoded || !decoded.userId) {
+		if (!decoded || !decoded.founderId) {
 			return res.status(401).json({
 				responseType: 'error',
 				responseMessage:
@@ -52,23 +53,22 @@ const verifyAuth = async (req, res, next) => {
 			});
 		}
 
-		// TODO: uncomment this code when the user model is ready.
-		// check if a user exists with a given userid
-		// const userWithId = await findUserById({ id: decoded.userId });
-		// if (userWithId.responseType === 'error') {
-		// 	return res.status(401).json({
-		// 		responseType: 'error',
-		// 		responseMessage:
-		// 			'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
-		// 		responseCode: 401,
-		// 		responseUniqueCode: 'unauthorized',
-		// 		responsePayload: null,
-		// 		responseId: 'fasflkjf9798237j1414117908',
-		// 	});
-		// }
+		// check if a user exists with a given founderId
+		const userWithId = await getFounderById({ founderId: decoded.founderId });
+		if (userWithId.responseType === 'error') {
+			return res.status(401).json({
+				responseType: 'error',
+				responseMessage:
+					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+				responseCode: 401,
+				responseUniqueCode: 'unauthorized',
+				responsePayload: null,
+				responseId: 'fasflkjf9798237j1414117908',
+			});
+		}
 
 		// storing decoded object in the request body so that we can use it in future middlewares.
-		// It is being used in the routes and logging middleware, so that we can log the userId in the logs.
+		// It is being used in the routes and logging middleware, so that we can log the founderId in the logs.
 		req.user = decoded;
 		next();
 	} catch (error) {

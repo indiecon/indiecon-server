@@ -77,7 +77,17 @@ app.get('/', (_req, res) => {
 });
 
 // middleware function to verify the origin of the request from the x-custom-header is used in the requests and not globally because we dont want to check origin for the health check route and the fallback route.
-app.use('/api/v1/user', verifyOrigin);
+app.use(
+	'/api/v1/founder',
+	verifyOrigin,
+	require('./src/components/founder/routes.founder')
+);
+
+app.use(
+	'/api/v1/startup',
+	verifyOrigin,
+	require('./src/components/startup/routes.startup')
+);
 
 // for fallback routes (not found or malformed routes)
 app.use((_req, res) => {
