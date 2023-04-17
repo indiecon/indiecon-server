@@ -82,7 +82,12 @@ const verifyOrigin = async (req, res, next) => {
 			});
 		}
 
-		const acceptedOrigins = ['postman', 'production', 'localhost'];
+		const acceptedOrigins = [
+			'postman',
+			'production',
+			'localhost',
+			'indiecon_webapp',
+		];
 
 		if (!acceptedOrigins.includes(origin)) {
 			return res.status(403).json({
