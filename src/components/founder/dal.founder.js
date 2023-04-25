@@ -354,10 +354,102 @@ const updateFounderProfile = async (context) => {
 
 		founderId = founderId.trim();
 
+		// All fields are mandatory. Add validation for each field as well.
+
+		// firstName must be a string and between 3 and 12 characters
 		firstName = firstName ? firstName.trim() : '';
+
+		if (!firstName || firstName.length < 3 || firstName.length > 12) {
+			return {
+				responseType: 'error',
+				responseUniqueCode: 'update_founder_profile_error',
+				responsePayload: null,
+				responseCode: 400,
+				responseMessage: 'First name must be between 3 and 12 characters long.',
+				responseId: 'yba1ZbVI4G5DJx9C',
+			};
+		}
+
+		// lastName must be a string and between 3 and 12 characters
 		lastName = lastName ? lastName.trim() : '';
+
+		if (!lastName || lastName.length < 3 || lastName.length > 12) {
+			return {
+				responseType: 'error',
+				responseUniqueCode: 'update_founder_profile_error',
+				responsePayload: null,
+				responseCode: 400,
+				responseMessage: 'Last name must be between 3 and 12 characters long.',
+				responseId: 'oiRjvDXEsplHcnYT',
+			};
+		}
+
 		twitterUsername = twitterUsername ? twitterUsername.trim() : '';
+		// twitter username validation
+
+		if (twitterUsername) {
+			if (twitterUsername[0] === '@') {
+				twitterUsername = twitterUsername.slice(1);
+			}
+		}
+
+		if (
+			!twitterUsername ||
+			twitterUsername.length < 4 ||
+			twitterUsername.length > 15
+		) {
+			return {
+				responseType: 'error',
+				responseUniqueCode: 'update_founder_profile_error',
+				responsePayload: null,
+				responseCode: 400,
+				responseMessage:
+					'Twitter username must be between 4 and 15 characters long.',
+				responseId: 'rJSmiLl8NVpoQqbn',
+			};
+		}
+
+		// username can only contain letters, numbers and '_'
+		const twitterUsernameRegex = /^[a-zA-Z0-9_]+$/;
+		if (!twitterUsernameRegex.test(twitterUsername)) {
+			return {
+				responseType: 'error',
+				responseUniqueCode: 'update_founder_profile_error',
+				responsePayload: null,
+				responseCode: 400,
+				responseMessage:
+					"Twitter username can only contain letters, numbers and '_'",
+
+				responseId: 'OGKeXUUDX0L2m9YC',
+			};
+		}
+
 		bio = bio ? bio.trim() : '';
+
+		// if more than 1 \n is found in bio, replace it with a single \n
+		bio = bio.replace(/\n\n+/g, '\n');
+
+		if (!bio) {
+			return {
+				responseType: 'error',
+				responseUniqueCode: 'update_founder_profile_error',
+				responsePayload: null,
+				responseCode: 400,
+				responseMessage: 'Please enter a bio',
+				responseId: '60f56SglDeBrBTnR',
+			};
+		}
+
+		if (bio.length > 240 || bio.length < 30) {
+			return {
+				responseType: 'error',
+				responseUniqueCode: 'update_founder_profile_error',
+				responsePayload: null,
+				responseCode: 400,
+				responseMessage: 'Bio must be between 30 and 240 characters long.',
+				responseId: 'KV6wnPgKHHrqyn76',
+			};
+		}
 
 		const currentUserandStartupResult = await getFounderById({
 			founderId,
@@ -558,6 +650,104 @@ const getFounderAndStartupByStartupId = async (context) => {
 		};
 	}
 };
+
+// // used to update isProfileLocked and profileLockedTill
+// const updateLockFounderProfileDetails = async (context) => {
+// 	try {
+// 		if (!context || !context.founderId || !context.founderId.trim()) {
+// 			return {
+// 				responseType: 'error',
+// 				responseUniqueCode: 'lockFounderProfile_error',
+// 				responsePayload: null,
+// 				responseCode: 400,
+// 				responseMessage:
+// 					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+// 				responseId: 'VLDL1yvkz8bAzb2M',
+// 			};
+// 		}
+
+// 		// profileLockedTill is date in epoch format (in milliseconds)
+// 		let { founderId, isProfileLocked, profileLockedTill } = context;
+
+// 		founderId = founderId.trim();
+
+// 		if (isProfileLocked === undefined || isProfileLocked === null) {
+// 			return {
+// 				responseType: 'error',
+// 				responseUniqueCode: 'lockFounderProfile_error',
+// 				responsePayload: null,
+// 				responseCode: 400,
+// 				responseMessage:
+// 					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+// 				responseId: 'j5QhTTs5U2BNAp5Y',
+// 			};
+// 		}
+
+// 		if (isProfileLocked && !profileLockedTill) {
+// 			return {
+// 				responseType: 'error',
+// 				responseUniqueCode: 'lockFounderProfile_error',
+// 				responsePayload: null,
+// 				responseCode: 400,
+// 				responseMessage:
+// 					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+// 				responseId: 'pbiJJrsRKB1lMdwd',
+// 			};
+// 		}
+
+// 		if (isProfileLocked && profileLockedTill) {
+// 			profileLockedTill = new Date(profileLockedTill);
+// 		}
+
+// 		if (!isProfileLocked) {
+// 			profileLockedTill = null;
+// 		}
+
+// 		const updatedFounder = await FounderModel.findByIdAndUpdate(
+// 			founderId,
+// 			{
+// 				isProfileLocked,
+// 				profileLockedTill,
+// 			},
+// 			{
+// 				new: true,
+// 			}
+// 		);
+
+// 		if (!updatedFounder) {
+// 			return {
+// 				responseType: 'error',
+// 				responseUniqueCode: 'lockFounderProfile_error',
+// 				responsePayload: null,
+// 				responseCode: 500,
+// 				responseMessage:
+// 					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+// 				responseId: '8zoRhQhqdxEB8xyr',
+// 			};
+// 		}
+
+// 		return {
+// 			responseType: 'success',
+// 			responseUniqueCode: 'lockFounderProfile_success',
+// 			responsePayload: updatedFounder,
+// 			responseCode: 200,
+// 			responseMessage: 'Founder profile locked',
+// 			responseId: '0mNhJSIGklVIqZS3',
+// 		};
+// 	} catch (error) {
+// 		errorLogger('cUeBCSHj7G8DYic9', error);
+// 		return {
+// 			responseType: 'error',
+// 			responseUniqueCode: 'lockFounderProfile_error',
+// 			responsePayload: null,
+// 			responseCode: 500,
+// 			responseMessage:
+// 				'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+
+// 			responseId: 'cUeBCSHj7G8DYic9',
+// 		};
+// 	}
+// };
 
 module.exports = {
 	getFounderByEmail,

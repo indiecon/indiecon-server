@@ -38,6 +38,13 @@ const FounderSchema = new Schema(
 			type: Boolean,
 			default: false,
 		},
+		// isProfileLocked: {
+		// 	type: Boolean,
+		// 	default: false,
+		// },
+		// profileLockedTill: {
+		// 	type: Date,
+		// },
 	},
 	{
 		timestamps: true,

@@ -88,6 +88,68 @@ const updateStartupProfile = async (context) => {
 		socialLink = socialLink ? socialLink.trim() : '';
 		industry = industry ? industry.trim() : '';
 
+		if (!name || name.length < 3 || name.length > 15) {
+			return {
+				responseType: 'error',
+				responseUniqueCode: 'update_startup_profile_error',
+				responsePayload: null,
+				responseCode: 400,
+				responseMessage: 'Startup name must be between 3 and 15 characters.',
+				responseId: 'CN5mwMDTGlZ27tKa',
+			};
+		}
+
+		// test mainLink with regex (can start with http:// or https://. Not important. Can have www or not.)
+		const urlRegex = /^(http|https):\/\/[a-zA-Z0-9-_.]+\.[a-zA-Z]{2,5}/;
+
+		if (!mainLink || !urlRegex.test(mainLink)) {
+			return {
+				responseType: 'error',
+				responseUniqueCode: 'update_startup_profile_error',
+				responsePayload: null,
+				responseCode: 400,
+				responseMessage:
+					'Website/App link must be a valid url. Should start with http or https.',
+				responseId: 'HzNMWC1fAyAGlRnX',
+			};
+		}
+
+		if (!socialLink || !urlRegex.test(socialLink)) {
+			return {
+				responseType: 'error',
+				responseUniqueCode: 'update_startup_profile_error',
+				responsePayload: null,
+				responseCode: 400,
+				responseMessage:
+					'Social media link must be a valid url. Should start with http or https.',
+				responseId: 'whxPhSOdCZLPBBYP',
+			};
+		}
+
+		if (!industry || industry.length < 4 || industry.length > 15) {
+			return {
+				responseType: 'error',
+				responseUniqueCode: 'update_startup_profile_error',
+				responsePayload: null,
+				responseCode: 400,
+				responseMessage: 'Industry must be between 4 and 15 characters.',
+				responseId: '5hin0j4Ng1RtzhIo',
+			};
+		}
+
+		description = description.replace(/\n\n+/g, '\n');
+
+		if (!description || description.length > 240 || description.length < 30) {
+			return {
+				responseType: 'error',
+				responseUniqueCode: 'update_startup_profile_error',
+				responsePayload: null,
+				responseCode: 400,
+				responseMessage: 'Description must be between 30 and 240 characters.',
+				responseId: '9DQqpS9Kb1ChaKhZ',
+			};
+		}
+
 		const updatedStartup = await StartupModel.findByIdAndUpdate(
 			startupId,
 			{

@@ -139,7 +139,7 @@ const getPublicStartupProfile = async (req, res) => {
 
 	const newData = {
 		id: data.startupId.id,
-		name: data.startupId.name,
+		startupName: data.startupId.name,
 		description: data.startupId.description,
 		mainLink: data.startupId.mainLink,
 		socialLink: data.startupId.socialLink,
@@ -148,6 +148,7 @@ const getPublicStartupProfile = async (req, res) => {
 		founderId: data.id,
 		firstName: data.firstName,
 		lastName: data.lastName,
+		twitterUsername: data.twitterUsername,
 	};
 
 	return res
@@ -175,6 +176,7 @@ const listStartupsController = async (req, res) => {
 			description: founder.startupId.description,
 			mainLink: founder.startupId.mainLink,
 			socialLink: founder.startupId.socialLink,
+			twitterUsername: founder.twitterUsername,
 			industry: founder.startupId.industry,
 			createdAt: founder.startupId.createdAt,
 		};

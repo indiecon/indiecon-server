@@ -2,6 +2,7 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const { google } = require('googleapis');
 
 const { config } = require('./src/config/config');
 const { db } = require('./src/db/mongoClient');
@@ -16,6 +17,7 @@ const {
 	generateCustomHeader,
 } = require('./src/utils/generateCustomHeader.utils');
 const { errorLogger } = require('./src/utils/logErrors.utils');
+const { verifyAuth } = require('./src/middlewares/verifyAuth.middlewares.js');
 
 const app = express();
 
@@ -88,6 +90,182 @@ app.use(
 	verifyOrigin,
 	require('./src/components/startup/routes.startup')
 );
+
+app.use(
+	'/api/v1/invite',
+	verifyOrigin,
+	require('./src/components/invite/routes.invite')
+);
+
+const oauth2Client = new google.auth.OAuth2(
+	process.env.GOOGLE_CLIENT_ID,
+	process.env.GOOGLE_CLIENT_SECRET,
+	`${process.env.FRONTEND_URL}/google/redirect`
+);
+
+const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
+
+const scopes = [
+	'https://www.googleapis.com/auth/calendar',
+	'https://www.googleapis.com/auth/userinfo.profile',
+	'https://www.googleapis.com/auth/userinfo.email',
+];
+
+app.get('/api/v1/google/url', [verifyOrigin, verifyAuth], async (req, res) => {
+	try {
+		const url = oauth2Client.generateAuthUrl({
+			access_type: 'offline',
+			scope: scopes,
+		});
+
+		const response = {
+			responseType: 'success',
+			responseUniqueCode: 'generateAuthUrl_success',
+			responsePayload: url,
+			responseCode: 200,
+			responseMessage: '',
+			responseId: 'Ia1IPJ7m0QUTrPcn',
+		};
+
+		return res.status(response.responseCode).json(response);
+	} catch (err) {
+		errorLogger('EK5W7aH7Wt4f95kF', err);
+		const response = {
+			responseType: 'error',
+			responseUniqueCode: 'generateAuthUrl_error',
+			responsePayload: null,
+			responseCode: 500,
+			responseMessage:
+				'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+			responseId: 'EK5W7aH7Wt4f95kF',
+		};
+
+		return res.status(response.responseCode).json(response);
+	}
+});
+
+// no verify origin or verify auth because this is called from backend.
+app.post('/api/v1/google/schedule', async (req, res) => {
+	try {
+		const {
+			code,
+			inviterFirstName,
+			meetStartDateTimeInUTC,
+			meetEndDateTimeInUTC,
+			inviterEmail,
+			inviteeEmail,
+		} = req.body;
+
+		if (
+			!code ||
+			!inviterFirstName ||
+			!meetStartDateTimeInUTC ||
+			!meetEndDateTimeInUTC ||
+			!inviterEmail ||
+			!inviteeEmail
+		) {
+			return res.status(400).json({
+				responseType: 'error',
+				responseUniqueCode: 'scheduleMeet_error',
+				responsePayload: null,
+				responseCode: 400,
+				responseMessage:
+					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+				responseId: 'HV6gdQ6TjjtGUgMH',
+			});
+		}
+
+		const { tokens } = await oauth2Client.getToken(code);
+
+		oauth2Client.setCredentials(tokens);
+
+		// Get the logged-in user's email
+		const { data } = await oauth2.userinfo.get();
+		const email = data.email;
+
+		if (email !== inviteeEmail) {
+			return res.status(401).json({
+				responseType: 'error',
+				responseUniqueCode: 'scheduleMeet_error',
+				responsePayload: null,
+				responseCode: 401,
+				responseMessage:
+					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+				responseId: 'XT2KI0WH8CP3aY0n',
+			});
+		}
+
+		const event = {
+			summary: `Indiecon Invite by ${inviterFirstName}`,
+			location: 'Google Meet',
+			description: `This is the meet scheduled by ${inviterFirstName} via Indiecon`,
+			start: {
+				dateTime: meetStartDateTimeInUTC,
+			},
+			end: {
+				dateTime: meetEndDateTimeInUTC,
+			},
+			attendees: [{ email: inviterEmail }, { email: inviteeEmail }],
+			reminders: {
+				useDefault: false,
+				overrides: [
+					{ method: 'email', minutes: 60 },
+					{ method: 'popup', minutes: 10 },
+				],
+			},
+			conferenceData: {
+				createRequest: {
+					requestId: Math.floor(
+						1000000000 + Math.random() * 9000000000
+					).toString(),
+				},
+			},
+			sendUpdates: 'all',
+		};
+
+		calendar.events.insert(
+			{
+				auth: oauth2Client,
+				calendarId: 'primary',
+				conferenceDataVersion: 1,
+				requestBody: event,
+			},
+			function (err, event) {
+				if (err) {
+					return res.status(400).json({
+						responseType: 'error',
+						responseUniqueCode: 'scheduleMeet_error',
+						responsePayload: null,
+						responseCode: 400,
+						responseMessage:
+							'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+						responseId: 'zwNPAnu07C1k24g4',
+					});
+				}
+				return res.status(200).json({
+					responseType: 'success',
+					responseUniqueCode: 'scheduleMeet_success',
+					responsePayload: event.data,
+					responseCode: 200,
+					responseMessage: '',
+					responseId: 'gFvrmEsR6P1F3kef',
+				});
+			}
+		);
+	} catch (err) {
+		errorLogger('YIJJxT5vlDj2M1Wl', err);
+		return res.status(500).json({
+			responseType: 'error',
+			responseUniqueCode: 'scheduleMeet_error',
+			responsePayload: null,
+			responseCode: 500,
+			responseMessage:
+				'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+			responseId: 'YIJJxT5vlDj2M1Wl',
+		});
+	}
+});
 
 // for fallback routes (not found or malformed routes)
 app.use((_req, res) => {
