@@ -70,9 +70,9 @@ db.once('open', () => console.log('Connected to Database'));
 app.get('/', (_req, res) => {
 	res.status(200).json({
 		responseType: 'success',
-		responseMessage: 'Extension server is up and running',
+		responseMessage: 'Indiecon server is up and running',
 		responseCode: 200,
-		responseUniqueCode: 'extension_server_healthy',
+		responseUniqueCode: 'server_healthy',
 		responsePayload: null,
 		responseId: '238279hskdjfh827389bkjsb',
 		env: process.env.NODE_ENV, // so that we can verify the env and the domain of the server.
