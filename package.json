@@ -4,10 +4,8 @@
 	"description": "This repository serves as the server for the Indiecon web app.",
 	"main": "index.js",
 	"scripts": {
-		"dev": "pm2 start ecosystem.config.js --only 'indiecon-server-dev'",
-		"staging": "pm2 start ecosystem.config.js --only 'indiecon-server-staging'",
-		"prod": "pm2 start ecosystem.config.js --only 'indiecon-server-prod'",
-		"nodemon": "NODE_ENV=development nodemon index.js"
+		"dev": "NODE_ENV=development nodemon index.js",
+		"start": "NODE_ENV=production nodemon index.js"
 	},
 	"repository": {
 		"type": "git",
