@@ -117,7 +117,10 @@ app.get('/api/v1/google/url', [verifyOrigin, verifyAuth], async (req, res) => {
 		const url = oauth2Client.generateAuthUrl({
 			access_type: 'offline',
 			scope: scopes,
+			include_granted_scopes: true,
 		});
+
+		console.log('url', url);
 
 		const response = {
 			responseType: 'success',
@@ -177,10 +180,21 @@ app.post('/api/v1/google/schedule', async (req, res) => {
 		}
 
 		try {
-			const { tokens } = await oauth2Client.getToken(code);
+			console.log('code', code);
+
+			const newCode = code.replace('&scope', '');
+
+			console.log('newCOde', newCode);
+
+			const { tokens } = await oauth2Client.getToken(newCode);
+
+			console.log('tokens');
+			console.log(tokens);
 
 			oauth2Client.setCredentials(tokens);
 		} catch (err) {
+			console.log('error');
+			console.log(err);
 			errorLogger('gPYz7pydsTr2pF3A', err);
 			return res.status(400).json({
 				responseType: 'error',
