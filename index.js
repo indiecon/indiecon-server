@@ -104,14 +104,13 @@ const oauth2Client = new google.auth.OAuth2(
 	`${process.env.FRONTEND_URL}/google/redirect`
 );
 
-const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+const calendar = google.calendar({
+	version: 'v3',
+	auth: process.env.GOOGLE_API_KEY,
+});
 const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
 
-const scopes = [
-	'https://www.googleapis.com/auth/calendar',
-	'https://www.googleapis.com/auth/userinfo.profile',
-	'https://www.googleapis.com/auth/userinfo.email',
-];
+const scopes = ['https://www.googleapis.com/auth/calendar'];
 
 app.get('/api/v1/google/url', [verifyOrigin, verifyAuth], async (req, res) => {
 	try {
@@ -177,9 +176,22 @@ app.post('/api/v1/google/schedule', async (req, res) => {
 			});
 		}
 
-		const { tokens } = await oauth2Client.getToken(code);
+		try {
+			const { tokens } = await oauth2Client.getToken(code);
 
-		oauth2Client.setCredentials(tokens);
+			oauth2Client.setCredentials(tokens);
+		} catch (err) {
+			errorLogger('gPYz7pydsTr2pF3A', err);
+			return res.status(400).json({
+				responseType: 'error',
+				responseUniqueCode: 'scheduleMeet_error',
+				responsePayload: null,
+				responseCode: 400,
+				responseMessage:
+					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+				responseId: 'gPYz7pydsTr2pF3A',
+			});
+		}
 
 		// Get the logged-in user's email
 		const { data } = await oauth2.userinfo.get();
@@ -192,7 +204,7 @@ app.post('/api/v1/google/schedule', async (req, res) => {
 				responsePayload: null,
 				responseCode: 401,
 				responseMessage:
-					'Internal error. Please refresh the page and try again. If error persists, please contact the team.',
+					'Please use the email on which you received the invite.',
 				responseId: 'XT2KI0WH8CP3aY0n',
 			});
 		}
