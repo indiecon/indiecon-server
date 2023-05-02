@@ -78,8 +78,8 @@ const getInviteDetailsController = async (req, res) => {
 			meetingAcceptedDateAndTime: responsePayload.meetingAcceptedDateAndTime
 				? responsePayload.meetingAcceptedDateAndTime
 				: '',
-			meetingLink: responsePayload.meetingLink
-				? responsePayload.meetingLink
+			calendarLink: responsePayload.calendarLink
+				? responsePayload.calendarLink
 				: '',
 			createdAt: responsePayload.createdAt,
 		},
@@ -113,15 +113,14 @@ const updateInviteStatusController = async (req, res) => {
 
 	const { inviteId, inviteStatus } = req.params;
 
-	// send jwt, google code, inviteId, acceptedTimeAndDateId if the invite is accepted
+	// send jwt, inviteId, acceptedTimeAndDateId if the invite is accepted
 	// acceptedTimeAndDateId can be meetingDateAndTimeOne or meetingDateAndTimeTwo
-	const { googleCode, meetingAcceptedDateAndTimeId } = req.body;
+	const { meetingAcceptedDateAndTimeId } = req.body;
 
 	const updateInviteStatusResponse = await updateInviteDetails({
 		founderId,
 		inviteId: inviteId ? inviteId : '',
 		inviteStatus: inviteStatus ? inviteStatus : '',
-		googleCode: googleCode ? googleCode : '',
 		meetingAcceptedDateAndTimeId: meetingAcceptedDateAndTimeId
 			? meetingAcceptedDateAndTimeId
 			: '',
@@ -151,8 +150,8 @@ const updateInviteStatusController = async (req, res) => {
 			meetingAcceptedDateAndTime: responsePayload.meetingAcceptedDateAndTime
 				? responsePayload.meetingAcceptedDateAndTime
 				: '',
-			meetingLink: responsePayload.meetingLink
-				? responsePayload.meetingLink
+			calendarLink: responsePayload.calendarLink
+				? responsePayload.calendarLink
 				: '',
 			createdAt: responsePayload.createdAt,
 		},

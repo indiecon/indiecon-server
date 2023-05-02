@@ -88,13 +88,13 @@ const updateStartupProfile = async (context) => {
 		socialLink = socialLink ? socialLink.trim() : '';
 		industry = industry ? industry.trim() : '';
 
-		if (!name || name.length < 3 || name.length > 15) {
+		if (!name || name.length < 2 || name.length > 15) {
 			return {
 				responseType: 'error',
 				responseUniqueCode: 'update_startup_profile_error',
 				responsePayload: null,
 				responseCode: 400,
-				responseMessage: 'Startup name must be between 3 and 15 characters.',
+				responseMessage: 'Startup name must be between 2 and 15 characters.',
 				responseId: 'CN5mwMDTGlZ27tKa',
 			};
 		}

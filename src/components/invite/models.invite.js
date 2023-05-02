@@ -59,12 +59,9 @@ const InviteSchema = new Schema(
 			type: String, // id of the meeting date and time
 			enum: ['meetingDateAndTimeOne', 'meetingDateAndTimeTwo'],
 		},
-		meetingLink: {
+		calendarLink: {
 			type: String,
 			trim: true,
-		},
-		meetingData: {
-			type: Object,
 		},
 	},
 	{

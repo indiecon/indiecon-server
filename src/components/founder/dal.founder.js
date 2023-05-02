@@ -359,13 +359,13 @@ const updateFounderProfile = async (context) => {
 		// firstName must be a string and between 3 and 12 characters
 		firstName = firstName ? firstName.trim() : '';
 
-		if (!firstName || firstName.length < 3 || firstName.length > 12) {
+		if (!firstName || firstName.length < 2 || firstName.length > 12) {
 			return {
 				responseType: 'error',
 				responseUniqueCode: 'update_founder_profile_error',
 				responsePayload: null,
 				responseCode: 400,
-				responseMessage: 'First name must be between 3 and 12 characters long.',
+				responseMessage: 'First name must be between 2 and 12 characters long.',
 				responseId: 'yba1ZbVI4G5DJx9C',
 			};
 		}
@@ -373,13 +373,13 @@ const updateFounderProfile = async (context) => {
 		// lastName must be a string and between 3 and 12 characters
 		lastName = lastName ? lastName.trim() : '';
 
-		if (!lastName || lastName.length < 3 || lastName.length > 12) {
+		if (!lastName || lastName.length < 2 || lastName.length > 12) {
 			return {
 				responseType: 'error',
 				responseUniqueCode: 'update_founder_profile_error',
 				responsePayload: null,
 				responseCode: 400,
-				responseMessage: 'Last name must be between 3 and 12 characters long.',
+				responseMessage: 'Last name must be between 2 and 12 characters long.',
 				responseId: 'oiRjvDXEsplHcnYT',
 			};
 		}

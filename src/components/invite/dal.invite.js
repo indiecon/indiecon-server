@@ -486,14 +486,12 @@ const updateInviteDetails = async (context) => {
 			};
 		}
 
-		const googleCode = context.googleCode ? context.googleCode.trim() : '';
 		const meetingAcceptedDateAndTimeId = context.meetingAcceptedDateAndTimeId
 			? context.meetingAcceptedDateAndTimeId.trim()
 			: '';
 
 		if (inviteStatus === 'accepted') {
 			if (
-				!googleCode ||
 				!meetingAcceptedDateAndTimeId ||
 				(meetingAcceptedDateAndTimeId !== 'meetingDateAndTimeOne' &&
 					meetingAcceptedDateAndTimeId !== 'meetingDateAndTimeTwo')
@@ -704,31 +702,7 @@ const updateInviteDetails = async (context) => {
 				};
 			}
 
-			const scheduleMeetingResponse = await axios.post(
-				`${process.env.BACKEND_URL}/api/v1/google/schedule`,
-				{
-					code: googleCode,
-					inviterFirstName: foundInvite.inviter.firstName,
-					meetStartDateTimeInUTC: acceptedDateAndTime,
-					meetEndDateTimeInUTC: new Date(
-						acceptedDateAndTime.getTime() +
-							Number(foundInvite.proposedMeetingDuration) * 60000
-					),
-					inviterEmail: foundInvite.inviter.email,
-					inviteeEmail: foundInvite.invitee.email,
-				},
-				{
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				}
-			);
-
-			if (scheduleMeetingResponse.data.responseType === 'error')
-				return scheduleMeetingResponse.data;
-
 			// send emails to both invitee and inviter
-
 			const inviteeJwtTokenResponse = await generateJWT({
 				founderId: foundInvite.invitee.id,
 			});
@@ -769,19 +743,56 @@ const updateInviteDetails = async (context) => {
 			if (inviterEmailResponse.responseType === 'error')
 				return inviterEmailResponse;
 
-			// get meeting link and update the db with status, meeting link, and meeting date and time, meeting data
-			const response = scheduleMeetingResponse.data.responsePayload;
+			// convert acceptedDateAndTime (2023-05-26T11:42:00.000Z) to 20230526T114200Z
+			const acceptedDateAndTimeInGoogleCalendarFormat = acceptedDateAndTime
+				.toISOString()
+				.replace(/-|:|\.\d\d\d/g, '')
+				.replace('T', 'T');
+
+			const meetingDurationInMinutes = foundInvite.proposedMeetingDuration;
+
+			const meetingEndDateAndTime = new Date(
+				acceptedDateAndTime.setMinutes(
+					acceptedDateAndTime.getMinutes() + meetingDurationInMinutes
+				)
+			);
+
+			const meetingEndDateAndTimeInGoogleCalendarFormat = meetingEndDateAndTime
+				.toISOString()
+				.replace(/-|:|\.\d\d\d/g, '')
+				.replace('T', 'T');
+
+			// todo
+			const urlQueryParams = new URLSearchParams({
+				action: 'TEMPLATE',
+				text: `Indiecon Invite by ${foundInvite.inviter.firstName} ${foundInvite.inviter.lastName}`,
+				dates:
+					acceptedDateAndTimeInGoogleCalendarFormat +
+					'/' +
+					meetingEndDateAndTimeInGoogleCalendarFormat,
+				details: `Indiecon meet between ${foundInvite.inviter.firstName} and ${foundInvite.invitee.firstName}. Invite Details: ${process.env.FRONTEND_URL}/invite/${inviteId}`,
+				location: 'Google Meet',
+				add: `${foundInvite.inviter.email},${foundInvite.invitee.email}`,
+				sprop: 'website:https://indiecon.co',
+				remindertype: 'email',
+				reminderminutes: 30,
+				guestsCanSeeOtherGuests: true,
+				guestsCanInviteOthers: true,
+				guestsCanModify: true,
+				pprop: 'HowCreated:QUICKADD',
+				sf: 'true',
+				output: 'xml',
+				invites: `${foundInvite.inviter.email},${foundInvite.invitee.email}`,
+			});
+
+			const googleCalendarLink = `https://calendar.google.com/calendar/render?${urlQueryParams.toString()}`;
 
 			const updatedInvite = await InviteModel.findByIdAndUpdate(
 				inviteId,
 				{
 					inviteStatus: 'accepted',
-					meetingLink: response.hangoutLink,
+					calendarLink: googleCalendarLink,
 					meetingAcceptedDateAndTime: meetingAcceptedDateAndTimeId,
-					meetingData: {
-						start: response.start,
-						end: response.end,
-					},
 				},
 				{ new: true }
 			);
